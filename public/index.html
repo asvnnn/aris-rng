@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A.R.I.S — Desktop OS &amp; Simulation Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css?v=2.8" />
+    <link rel="stylesheet" href="/apps/apps.css?v=1.4" />
+</head>
+<body>
+    <div id="lock-screen" class="win10-lock-screen">
+        <div class="win10-lock-bottom-left">
+            <div class="win10-lock-clock" id="lock-clock">10:27</div>
+            <div class="win10-lock-date" id="lock-date">Sunday, October 25</div>
+        </div>
+        <div class="win10-lock-bottom-right">
+            <div class="win10-lock-tray-icon" title="Network status">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+            </div>
+        </div>
+        <div class="win10-lock-hint" id="lock-swipe-hint">
+            <span class="win10-lock-chevron">⌃</span>
+            <span>Click, swipe up, or press any key to unlock</span>
+        </div>
+    </div>
+
+    <div id="login-screen" class="win10-login-screen hidden">
+        <div class="win10-login-container">
+            <div class="win10-user-name" id="login-display-name">Other user</div>
+
+            <div id="login-error" class="win10-login-error hidden"></div>
+            <div id="login-success" class="win10-login-success hidden"></div>
+
+            <div id="login-oauth-view" class="win10-login-view">
+                <button class="win10-login-submit-btn" id="btn-discord-oauth">
+                    <span>Sign in with Discord</span>
+                    <span class="win10-arrow">→</span>
+                </button>
+            </div>
+
+            <div id="login-otp-view" class="win10-login-view hidden">
+                <div class="win10-input-box" style="margin-bottom: 8px;">
+                    <input type="text" id="login-otp-identifier" class="win10-input" placeholder="Username or User ID" autocomplete="username" />
+                </div>
+                <div id="login-otp-verify-row" class="win10-input-box" style="margin-bottom: 8px;">
+                    <input type="text" id="login-otp-code" class="win10-input" maxlength="10" placeholder="Enter 6-digit code" autocomplete="one-time-code" />
+                    <button class="win10-btn-arrow" id="btn-verify-otp" title="Sign In">→</button>
+                </div>
+                <div style="display: flex; justify-content: flex-end; width: 260px; font-size: 11px;">
+                    <button type="button" class="win10-text-link" id="btn-request-otp">📩 Send code to Discord DM</button>
+                </div>
+            </div>
+
+            <div class="win10-signin-options" id="btn-toggle-signin-options">
+                <span>Sign in with code</span>
+            </div>
+            <div class="win10-signin-options hidden" id="btn-back-oauth" style="margin-top: 14px;">
+                <span>← Back to Discord OAuth2</span>
+            </div>
+
+            <div id="oauth-redirect-hint" class="hidden">
+                <code id="oauth-redirect-uri-display"></code>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-resolution-warning" class="fullscreen-overlay hidden" style="z-index: 99998; backdrop-filter: blur(25px);">
+        <div class="login-card" style="border: 2px solid var(--win-accent); text-align: center; max-width: 440px;">
+            <div style="font-size: 48px; margin-bottom: 12px;">🖥️</div>
+            <h2 style="color: var(--win-accent); margin-bottom: 8px; font-size: 18px;">Screen Resolution Too Small</h2>
+            <p style="color: var(--win-text); font-size: 13px; line-height: 1.6; margin-bottom: 14px;">
+                A.R.I.S Web OS requires a minimum viewport of <strong>900 × 500</strong> to prevent layout distortion.<br>
+                Current viewport: <strong id="res-current-size" class="mono" style="color: #fcff61;">0 × 0</strong>
+            </p>
+            <div style="background: rgba(0, 120, 215, 0.12); border: 1px solid rgba(0, 120, 215, 0.35); padding: 10px; font-size: 11px; color: var(--win-text-dim);">
+                📐 Please maximize or expand your browser window to resume using the desktop.
+            </div>
+        </div>
+    </div>
+
+    <div id="desktop">
+
+        <div class="desktop-icons" id="desktop-icons-container">
+            <div class="desktop-icon" data-target="win-roll">
+                <div class="icon-glyph">🎲</div>
+                <div class="icon-label">Roll</div>
+            </div>
+            <div class="desktop-icon" data-target="win-shop">
+                <div class="icon-glyph">🛒</div>
+                <div class="icon-label">Shop</div>
+            </div>
+            <div class="desktop-icon" data-target="win-inventory">
+                <div class="icon-glyph">🎒</div>
+                <div class="icon-label">Inventory</div>
+            </div>
+            <div class="desktop-icon" data-target="win-taskmgr">
+                <div class="icon-glyph">📊</div>
+                <div class="icon-label">Task Manager</div>
+            </div>
+            <div class="desktop-icon" data-target="win-profile">
+                <div class="icon-glyph">👤</div>
+                <div class="icon-label">Profile</div>
+            </div>
+            <div class="desktop-icon" data-target="win-hub">
+                <div class="icon-glyph">🎯</div>
+                <div class="icon-label">Mission Hub</div>
+            </div>
+            <div class="desktop-icon" data-target="win-leaderboard">
+                <div class="icon-glyph">🏆</div>
+                <div class="icon-label">Leaderboard</div>
+            </div>
+            <div class="desktop-icon" data-target="win-terminal">
+                <div class="icon-glyph">💻</div>
+                <div class="icon-label">Terminal</div>
+            </div>
+            <div class="desktop-icon" data-target="win-settings">
+                <div class="icon-glyph">⚙️</div>
+                <div class="icon-label">Settings</div>
+            </div>
+        </div>
+
+        <div class="window hidden" id="win-roll" data-title="A.R.I.S Roll" data-icon="🎲" style="top: 52px; left: 190px; width: 510px; height: 470px;">
+            <div class="title-bar">
+                <div class="title-bar-left">
+                    <span class="win-icon">🎲</span>
+                    <span class="win-title">A.R.I.S — Roll Engine</span>
+                </div>
+                <div class="title-bar-controls">
+                    <button class="win-ctrl btn-min" title="Minimize">&#x2012;</button>
+                    <button class="win-ctrl btn-max" title="Maximize">&#x25A1;</button>
+                    <button class="win-ctrl btn-close" title="Close">&#x2715;</button>
+                </div>
+            </div>
+            <div class="window-body roll-body">
+                <div class="roll-display-box" id="roll-display-box">
+                    <div class="roll-subtitle" id="roll-action-status">READY TO ROLL</div>
+                    <div class="roll-main-number" id="roll-main-number">1 in 1</div>
+                    <div class="roll-Compare-row">
+                        <span>Best (+): <strong id="roll-best-pos">0</strong></span>
+                        <span>Best (-): <strong id="roll-best-neg">0</strong></span>
+                        <span>Total Rolls: <strong id="roll-total-count">0</strong></span>
+                    </div>
+                </div>
+
+                <div class="cooldown-track">
+                    <div class="cooldown-fill" id="roll-cd-fill" style="width: 100%;"></div>
+                    <span class="cooldown-label" id="roll-cd-text">Ready now</span>
+                </div>
+
+                <div class="roll-controls-row">
+                    <button class="win-btn primary large" id="btn-roll-now">
+                        🎲 ROLL (SPACE)
+                    </button>
+                    <button class="win-btn" id="btn-auto-roll" title="Requires Auto-Roll Machine or Automatic Potion">
+                        🤖 Auto-Roll: OFF
+                    </button>
+                </div>
+
+                <div class="roll-log-section">
+                    <div class="section-header">Recent Roll History</div>
+                    <div class="roll-history-list" id="roll-history-list">
+                        <div class="empty-hint">Press ROLL or Spacebar to begin rolling...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window hidden" id="win-shop" data-title="A.R.I.S Store" data-icon="🛒" style="top: 60px; left: 240px; width: 730px; height: 520px;">
+            <div class="title-bar">
+                <div class="title-bar-left">
+                    <span class="win-icon">🛒</span>
+                    <span class="win-title" id="win-shop-title">A.R.I.S Store — Potions, Modules &amp; Chips</span>
+                </div>
+                <div class="title-bar-controls">
+                    <button class="win-ctrl btn-min" title="Minimize">&#x2012;</button>
+                    <button class="win-ctrl btn-max" title="Maximize">&#x25A1;</button>
+                    <button class="win-ctrl btn-close" title="Close">&#x2715;</button>
+                </div>
+            </div>
+            <div class="window-body shop-body">
+                <div class="win-tabs">
+                    <button class="win-tab active" data-shop-tab="potions">🧪 Potions</button>
+                    <button class="win-tab" data-shop-tab="modules">⚙️ Modules</button>
+                    <button class="win-tab" data-shop-tab="chips">💾 Chips</button>
+                    <button class="win-tab hidden" id="tab-shop-bshop" data-shop-tab="bshop">🌑 Black Market</button>
+                </div>
+
+                <div class="shop-wallet-bar" id="shop-wallet-bar">
+                    <div class="curr-pill" title="Coins">🪙 <span id="shop-coins">0</span></div>
+                    <div class="curr-pill" title="Crystals">💎 <span id="shop-crystals">0</span></div>
+                    <div class="curr-pill" title="NULL">⬛ <span id="shop-nulls">0</span></div>
+                    <div class="curr-pill" title="Compressed Crystal (CC)">💠 <span id="shop-cc">0</span> CC</div>
+                </div>
+
+                <div class="shop-split" id="shop-standard-view">
+                    <div class="shop-left-col" style="width: 48%; display: flex; flex-direction: column; gap: 6px; min-height: 0;">
+                        <input type="text" id="shop-search-input" class="win-input full-w" placeholder="🔎 Search Potions, Modules, or Chips..." />
+                        <div class="shop-list" id="shop-items-list" style="width: 100%; flex: 1;"></div>
+                    </div>
+                    <div class="shop-inspector" id="shop-inspector">
+                        <div class="inspector-title" id="insp-name">Select an item</div>
+                        <div class="inspector-rank" id="insp-cost">—</div>
+                        <div class="inspector-owned" id="insp-owned">Owned: 0</div>
+                        <div class="inspector-desc" id="insp-effect">Select a potion, module, or chip from the catalog to inspect its verbatim stats and crafting requirements.</div>
+                        <div class="inspector-craft-checklist" id="insp-craft-checklist"></div>
+                        <div class="inspector-lore" id="insp-lore"></div>
+
+                        <div class="inspector-actions">
+                            <div class="qty-row">
+                                <label for="shop-qty-input">Qty:</label>
+                                <input type="text" id="shop-qty-input" value="1" class="win-input small" />
+                                <button class="win-btn small" id="btn-qty-10">10</button>
+                                <button class="win-btn small" id="btn-qty-max">MAX</button>
+                            </div>
+                            <div class="action-btn-group">
+                                <button class="win-btn primary" id="btn-shop-buy" disabled>Buy / Craft</button>
+                                <button class="win-btn" id="btn-shop-use" disabled>Use / Equip</button>
+                            </div>
+                        </div>
+                        <div class="shop-feedback" id="shop-feedback"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window hidden" id="win-inventory" data-title="Inventory" data-icon="🎒" style="top: 80px; left: 240px; width: 620px; height: 460px;">
+            <div class="title-bar">
+                <div class="title-bar-left">
+                    <span class="win-icon">🎒</span>
+                    <span class="win-title">Storage Explorer — Rolls, Potions &amp; Hardware</span>
+                </div>
+                <div class="title-bar-controls">
+                    <button class="win-ctrl btn-min" title="Minimize">&#x2012;</button>
+                    <button class="win-ctrl btn-max" title="Maximize">&#x25A1;</button>
+                    <button class="win-ctrl btn-close" title="Close">&#x2715;</button>
+                </div>
+            </div>
+            <div class="window-body inv-body">
+                <div class="inv-wallet-banner">
+                    <div class="inv-profile-row">
+                        <div class="inv-user-info">
+                            <span class="inv-user-icon">👤</span>
+                            <span class="inv-username" id="inv-top-username">Not Signed In</span>
+                        </div>
+                        <button class="win-btn danger small" id="btn-inv-logout" title="Sign Out">🚪 Sign Out</button>
+                    </div>
+                    <div class="inv-currencies-grid">
+                        <div class="curr-pill" title="Coins">🪙 <span id="inv-coins">0</span></div>
+                        <div class="curr-pill" title="Crystals">💎 <span id="inv-crystals">0</span></div>
+                        <div class="curr-pill" title="NULL">⬛ <span id="inv-nulls">0</span></div>
+                        <div class="curr-pill" title="Compressed Crystal (CC)">💠 <span id="inv-cc">0</span> CC</div>
+                        <div class="curr-pill" title="Quest Tokens">🎫 <span id="inv-tokens">0</span></div>
+                    </div>
+                </div>
+
+                <div class="win-tabs">
+                    <button class="win-tab active" data-inv-tab="rolls">📥 Saved Rolls</button>
+                    <button class="win-tab" data-inv-tab="potions">🧪 My Potions</button>
+                    <button class="win-tab" data-inv-tab="hardware">⚙️ My Hardware</button>
+                </div>
+
+                <div class="inv-tab-pane" id="inv-pane-rolls">
+                    <div class="inv-toolbar">
+                        <div class="inv-capacity">
+                            Slots: <strong id="inv-used">0</strong> / <strong id="inv-max">10</strong>
+                        </div>
+                        <div class="inv-actions">
+                            <button class="win-btn" id="btn-expand-slot">➕ Expand Slot (💎 <span id="inv-expand-cost">1</span>)</button>
+                            <button class="win-btn danger" id="btn-sell-all">🪙 Sell All Unlocked</button>
+                        </div>
+                    </div>
+                    <div class="inv-table-wrap">
+                        <table class="win-table">
+                            <thead>
+                                <tr>
+                                    <th>Lock</th>
+                                    <th>Rarity Value</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inv-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="inv-tab-pane hidden" id="inv-pane-potions">
+                    <div class="inv-toolbar">
+                        <input type="text" id="inv-pot-search" class="win-input" style="width: 240px;" placeholder="🔎 Search owned potions..." />
+                        <div id="inv-pot-feedback" class="inline-feedback"></div>
+                    </div>
+                    <div class="inv-table-wrap">
+                        <table class="win-table">
+                            <thead>
+                                <tr>
+                                    <th>Potion Name</th>
+                                    <th>Rank</th>
+                                    <th>Owned</th>
+                                    <th>Effect</th>
+                                    <th>Consume</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inv-potions-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="inv-tab-pane hidden" id="inv-pane-hardware">
+                    <div class="inv-toolbar">
+                        <input type="text" id="inv-hw-search" class="win-input" style="width: 240px;" placeholder="🔎 Search owned modules &amp; chips..." />
+                        <div id="inv-hw-feedback" class="inline-feedback"></div>
+                    </div>
+                    <div class="inv-table-wrap">
+                        <table class="win-table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Device Name</th>
+                                    <th>Effect</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inv-hardware-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window hidden" id="win-taskmgr" data-title="Task Manager" data-icon="📊" style="top: 70px; left: 220px; width: 690px; height: 525px;">
+            <div class="title-bar">
+                <div class="title-bar-left">
+                    <span class="win-icon">📊</span>
+                    <span class="win-title">Task Manager — Luck Performance &amp; Active Buffs</span>
+                </div>
+                <div class="title-bar-controls">
+                    <button class="win-ctrl btn-min" title="Minimize">&#x2012;</button>
+                    <button class="win-ctrl btn-max" title="Maximize">&#x25A1;</button>
+                    <button class="win-ctrl btn-close" title="Close">&#x2715;</button>
+                </div>
+            </div>
+            <div class="window-body taskmgr-body" style="padding: 0; display: flex; flex-direction: column;">
+                <div class="win-tabs" style="border-bottom: 1px solid var(--win-border); padding: 0 8px; background: rgba(0,0,0,0.15);">
+                    <button class="win-tab active" data-taskmgr-tab="perf">📈 Performance (Luck Telemetry)</button>
+                    <button class="win-tab" data-taskmgr-tab="procs">⚡ Processes (<span id="active-pot-count">0</span>)</button>
+                    <button class="win-tab" data-taskmgr-tab="hw">⚙️ Hardware &amp; Pity Counters</button>
+                </div>
+
+                <div class="taskmgr-content" style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="taskmgr-pane" id="taskmgr-pane-perf" style="flex: 1; display: flex; overflow: hidden;">
+                        <div class="taskmgr-metric-list" id="taskmgr-metric-sidebar">
+                            <div class="metric-list-item active" data-metric="total">
+                                <div class="metric-item-title kw-final">TOTAL LUCK</div>
+                                <div class="metric-item-val mono kw-final" id="stat-total-preview">1.00x</div>
+                            </div>
+                            <div class="metric-list-item" data-metric="basic">
+                                <div class="metric-item-title kw-basic">Basic Luck</div>
+                                <div class="metric-item-val mono" id="stat-basic">+0 (+1 base)</div>
+                            </div>
+                            <div class="metric-list-item" data-metric="multi">
+                                <div class="metric-item-title kw-multi">Multi Luck</div>
+                                <div class="metric-item-val mono" id="stat-multi">x1.00</div>
+                            </div>
+                            <div class="metric-list-item" data-metric="special">
+                                <div class="metric-item-title kw-special">Special Luck</div>
+                                <div class="metric-item-val mono" id="stat-special">+0</div>
+                            </div>
+                            <div class="metric-list-item" data-metric="final">
+                                <div class="metric-item-title kw-final">FINAL LUCK</div>
+                                <div class="metric-item-val mono" id="stat-final">x1.00</div>
+                            </div>
+                            <div class="metric-list-item" data-metric="cooldown">
+                                <div class="metric-item-title" style="color: #00e5ff;">Cooldown</div>
+                                <div class="metric-item-val mono" id="stat-cd-preview">10.00s</div>
+                            </div>
+                        </div>
+
+                        <div class="taskmgr-telemetry-view">
+                            <div class="telemetry-header" id="taskmgr-telemetry-header">
+                                <div>
+                                    <div class="tl-label" id="taskmgr-active-metric-label">TOTAL LUCK TELEMETRY</div>
+                                    <div class="tl-val" id="stat-total-luck">1.00x</div>
+                                </div>
+                                <div class="tl-right">
+                                    <div class="tl-label">ROLL COOLDOWN</div>
+                                    <div class="tl-cd" id="stat-cooldown">10.00s</div>
+                                </div>
+                            </div>
+
+                            <div class="taskmgr-graph-card" id="taskmgr-graph-card">
+                                <div class="telemetry-toolbar" id="taskmgr-telemetry-toolbar">
+                                    <div class="graph-card-title" id="taskmgr-graph-title">TOTAL LUCK TELEMETRY</div>
+                                    <div class="telemetry-toolbar-actions" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                        <button class="telemetry-pill-btn taskmgr-pill-btn" id="btn-telemetry-scale" data-telemetry-action="toggle-scale" title="Toggle Scaling Mode (Auto / Linear / Log10)">SCALE: AUTO</button>
+                                        <span id="taskmgr-graph-stats" class="telemetry-buffer-badge">Buffer: 0/1000 Rolls</span>
+                                    </div>
+                                </div>
+                                <div class="taskmgr-canvas-wrap">
+                                    <canvas id="taskmgr-luck-canvas" height="110"></canvas>
+                                    <div id="taskmgr-hud-tooltip" class="taskmgr-hud-tooltip hidden"></div>
+                                </div>
+                                <div id="taskmgr-graph-legend" class="taskmgr-graph-legend">
+                                    <span>Min: <strong id="taskmgr-min-val" style="color:#fff;">0</strong></span>
+                                    <span>Avg: <strong id="taskmgr-avg-val" style="color:#fff;">0</strong></span>
+                                    <span>Max: <strong id="taskmgr-max-val" style="color:#fff;">0</strong></span>
+                                    <span>Current: <strong id="taskmgr-cur-val" style="color:var(--win-accent);">-</strong></span>
+                                </div>
+                                <div class="taskmgr-dev-bar" id="taskmgr-dev-bar">
+                                    <div class="dev-readout-stats">
+                                        <span title="Expected Value based on average Total Luck">EV: <strong id="dev-stat-ev">--</strong></span>
+                                        <span title="Sample Median Roll Rarity">Median: <strong id="dev-stat-median">--</strong></span>
+                                        <span title="RNG Convergence Ratio (Sample Mean / Theoretical EV)">Conv: <strong id="dev-stat-conv">--</strong></span>
+                                        <span title="Rolling Speed in rolls per minute">Velocity: <strong id="dev-stat-velocity">0 rpm</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hardware-bar" style="margin-top: 10px;">
+                                <div>⚙️ Module: <strong id="stat-mod-name">None</strong></div>
+                                <div>💾 Chip: <strong id="stat-chip-name">None</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="taskmgr-pane hidden" id="taskmgr-pane-procs" style="flex: 1; padding: 10px; display: flex; flex-direction: column; overflow: hidden;">
+                        <div class="section-header" style="margin-bottom: 6px;">Active Potions (<span id="active-pot-proc-count">0</span> Active Buffs)</div>
+                        <div class="taskmgr-proc-table-wrap">
+                            <div class="taskmgr-proc-header-row">
+                                <div class="pot-col-name">Name</div>
+                                <div class="pot-col-rank">Rank</div>
+                                <div class="pot-col-rolls">Remaining Rolls</div>
+                                <div class="pot-col-status">Status</div>
+                            </div>
+                            <div class="active-potions-list" id="active-potions-list"></div>
+                        </div>
+                    </div>
+
+                    <div class="taskmgr-pane hidden" id="taskmgr-pane-hw" style="flex: 1; padding: 12px; overflow-y: auto;">
+                        <div class="section-header" style="margin-bottom: 8px;">Hardware Passives, Pity &amp; Accumulation Counters</div>
+                        <div class="hardware-counters-list" id="hardware-counters-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window hidden" id="win-profile" data-title="Player Profile" data-icon="👤" style="top: 65px; left: 250px; width: 650px; height: 480px;">
+            <div class="title-bar">
+                <div class="title-bar-left">
+                    <span class="win-icon">👤</span>
+                    <span class="win-title">Player Profile — Stats, Achievements &amp; Titles</span>
+                </div>
+                <div class="title-bar-controls">
+                    <button class="win-ctrl btn-min" title="Minimize">&#x2012;</button>
+                    <button class="win-ctrl btn-max" title="Maximize">&#x25A1;</button>
+                    <button class="win-ctrl btn-close" title="Close">&#x2715;</button>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="win-tabs">
+                    <button class="win-tab active" data-prof-tab="stat">👤 Profile (&gt;stat)</button>
+                    <button class="win-tab" data-prof-tab="achieve">🏆 Achievements (&gt;achieve)</button>
+                    <button class="win-tab" data-prof-tab="titles">👑 Titles (&gt;title)</button>
+                </div>
+
+                <div class="prof-pane" id="prof-pane-stat">
+                    <div class="inv-toolbar">
+                        <div class="lookup-row">
+                            <input type="text" id="stat-lookup-input" class="win-input" placeholder="Inspect another player (Username or ID)..." />
+                            <button class="win-btn primary" id="btn-stat-lookup">🔍 Inspect</button>
+                            <button class="win-btn" id="btn-stat-self">My Profile</button>
+                        </div>
+                    </div>
+                    <div class="stat-card-grid" id="profile-stat-content"></div>
+                </div>
+
+                <div class="prof-pane hidden" id="prof-pane-achieve">
+                    <div class="inv-toolbar">
+                        <span>Unlocked: <strong id="ach-unlocked-count">0 / 0</strong></span>
+                        <input type="text" id="ach-search-input" class="win-input" style="width: 230px;" placeholder="🔎 Search achievements..." />
+                        <div id="ach-feedback" class="inline-feedback"></div>
+                    </div>
+                    <div class="inv-table-wrap">
+                        <table class="win-table">
+                            <thead>
+                                <tr>
+                                    <th>Achievement</th>
+                                    <th>Requirement</th>
+                                    <th>Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ach-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="prof-pane hidden" id="prof-pane-titles">
+                    <div class="inv-toolbar">
+                        <span>Roll Titles with Spectrometer Module!</span>
+                        <input type="text" id="title-search-input" class="win-input" style="width: 220px;" placeholder="🔎 Search titles..." />
+                        <div id="title-feedback" class="inline-feedback"></div>
+                    </div>
+                    <div class="inv-table-wrap">
+                        <table class="win-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Rarity</th>
+                                    <th>Owned</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="title-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window hidden" id="win-hub" data-title="Mission Hub" data-icon="🎯" style="top: 75px; left: 260px; width: 670px; height: 500px;">
+            <div class="title-bar">
+                <div class="title-bar-left">
+                    <span class="win-icon">🎯</span>
+                    <span class="win-title">Mission Hub — Daily, Shrine Pray, Quests, Codes &amp; Guide</span>
+                </div>
+                <div class="title-bar-controls">
+                    <button class="win-ctrl btn-min" title="Minimize">&#x2012;</button>
+                    <button class="win-ctrl btn-max" title="Maximize">&#x25A1;</button>
+                    <button class="win-ctrl btn-close" title="Close">&#x2715;</button>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="win-tabs">
+                    <button class="win-tab active" data-hub-tab="daily">🎁 Daily (&gt;daily)</button>
+                    <button class="win-tab" data-hub-tab="pray">🙏 Pray (&gt;pray)</button>
+                    <button class="win-tab" data-hub-tab="quests">📜 Quests (&gt;quest)</button>
+                    <button class="win-tab" data-hub-tab="code">🎟️ Redeem (&gt;code)</button>
+                    <button class="win-tab" data-hub-tab="guild">📘 Guide (&gt;guild)</button>
+                </div>
+
+                <div class="hub-pane" id="hub-pane-daily">
+                    <div class="hub-hero-box">
+                        <h3>🎁 Daily Supply Drop</h3>
+                        <p>Claim daily Coins, Potions, and Crystals scaled by your Total Rolls tier (Tier 1 to Tier 5).</p>
+                        <div class="hub-status-pill" id="daily-status-text">Checking status...</div>
+                        <button class="win-btn primary large" id="btn-claim-daily">🎁 Claim Daily Reward</button>
+                        <div class="shop-feedback" id="daily-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="hub-pane hidden" id="hub-pane-pray">
+                    <div class="hub-hero-box">
+                        <h3>🙏 Shrine of Probability (&gt;pray)</h3>
+                        <p>Offer a prayer every <strong>6 hours</strong> to permanently receive <strong class="kw-basic">+0.01 Basic Luck</strong>!</p>
+                        <div class="pray-stats-row">
+                            <span>Permanent Basic Luck: <strong id="pray-perm-luck" class="mono kw-basic">+0.00</strong></span>
+                            <span>Total Prayers: <strong id="pray-streak-val" class="mono">0</strong></span>
+                            <span>Eon Streak: <strong id="pray-eon-streak" class="mono">0 / 54</strong></span>
+                        </div>
+                        <div class="hub-status-pill" id="pray-status-text">Ready to pray</div>
+                        <button class="win-btn primary large" id="btn-pray-now">🙏 Offer Prayer (+0.01 Basic Luck)</button>
+                        <div class="shop-feedback" id="pray-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="hub-pane hidden" id="hub-pane-quests">
+                    <div class="inv-toolbar">
+                        <span>🎫 Quest Tokens: <strong id="quest-token-count">0</strong> | Free Rerolls Left: <strong id="quest-reroll-count">0</strong></span>
+                        <div id="quest-feedback" class="inline-feedback"></div>
+                    </div>
+                    <div class="quest-list" id="quest-list-container"></div>
+
+                    <div class="section-header" style="margin-top: 12px;">🎫 Quest Token Exchange Shop (Section 19)</div>
+                    <div class="token-shop-grid">
+                        <div class="token-shop-item">
+                            <div><strong>[1] 🧪 1x Crystal Maker</strong><br><small>🎫 2 Tokens (Limit: 2/day)</small></div>
+                            <button class="win-btn small primary" data-qshop-buy="1" data-qshop-label="1x Crystal Maker (2 Tokens)">Buy</button>
+                        </div>
+                        <div class="token-shop-item">
+                            <div><strong>[2] 🧪 5x Luck Potion</strong><br><small>🎫 1 Token</small></div>
+                            <button class="win-btn small primary" data-qshop-buy="2" data-qshop-label="5x Luck Potion (1 Token)">Buy</button>
+                        </div>
+                        <div class="token-shop-item">
+                            <div><strong>[3] 🧪 3x Speed Potion</strong><br><small>🎫 1 Token</small></div>
+                            <button class="win-btn small primary" data-qshop-buy="3" data-qshop-label="3x Speed Potion (1 Token)">Buy</button>
+                        </div>
+                        <div class="token-shop-item">
+                            <div><strong>[4] 🪙 400 Coins</strong><br><small>🎫 1 Token</small></div>
+                            <button class="win-btn small primary" data-qshop-buy="4" data-qshop-label="400 Coins (1 Token)">Buy</button>
+                        </div>
+                        <div class="token-shop-item">
+                            <div><strong>[5] 💎 1x Crystal</strong><br><small>🎫 3 Tokens (1/day • &gt;10k rolls)</small></div>
+                            <button class="win-btn small primary" data-qshop-buy="5" data-qshop-label="1x Crystal (3 Tokens)">Buy</button>
+                        </div>
+                        <div class="token-shop-item">
+                            <div><strong>[6] 🧪 1x Fortune III</strong><br><small>🎫 2 Tokens (Limit: 2/day)</small></div>
+                            <button class="win-btn small primary" data-qshop-buy="6" data-qshop-label="1x Fortune Potion III (2 Tokens)">Buy</button>
+                        </div>
+                        <div class="token-shop-item">
+                            <div><strong>[7] 🧪 2x Windy II</strong><br><small>🎫 2 Tokens (Limit: 2/day)</small></div>
+                            <button class="win-btn small primary" data-qshop-buy="7" data-qshop-label="2x Windy Potion II (2 Tokens)">Buy</button>
+                        </div>
+                        <div class="token-shop-item">
+                            <div><strong>[8] 🧪 1x Pop Potion</strong><br><small>🎫 5 Tokens (1/day • &gt;5k rolls)</small></div>
+                            <button class="win-btn small primary" data-qshop-buy="8" data-qshop-label="1x Pop Potion (5 Tokens)">Buy</button>
+                        </div>
+                        <div class="token-shop-item">
+                            <div><strong>[9] 💠 1x CC</strong><br><small>🎫 15 Tokens (1/wk • &gt;25k rolls)</small></div>
+                            <button class="win-btn small primary" data-qshop-buy="9" data-qshop-label="1x Compressed Crystal (15 Tokens)">Buy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hub-pane hidden" id="hub-pane-code">
+                    <div class="hub-hero-box">
+                        <h3>🎟️ Redeem Promotional Code</h3>
+                        <p>Enter an official A.R.I.S promotional or secret code to receive instant rewards.</p>
+                        <div class="code-input-row">
+                            <input type="text" id="code-redeem-input" class="win-input" placeholder="Enter code here" />
+                            <button class="win-btn primary" id="btn-redeem-code">Redeem Code</button>
+                        </div>
+                        <div class="shop-feedback" id="code-feedback"></div>
+                    </div>
+                </div>
+
+                <div class="hub-pane hidden" id="hub-pane-guild">
+                    <div class="guide-scroll">
+                        <div class="guide-block">
+                            <h4>💰 1. Currencies &amp; Economy</h4>
+                            <p>• <strong>Coins (🪙):</strong> Earned by selling rolled numbers (<code>1 Rarity = 1 Coin</code>; negative numbers sold also award positive Coins) and claiming <code>&gt;daily</code> rewards. Used for Potions, Modules, and Chips. Large numbers format cleanly into <code>xyz.ab Suffix</code> (K, M, B, T, Qa, Qi, Sx, Sp, Oc, No, Dc, etc.).</p>
+                            <p>• <strong>Crystals (💎):</strong> Obtained via <code>&gt;daily</code> drops, Achievements, <strong>Crystal Maker</strong> (2% chance / guaranteed at 75th roll), <strong>Crystal Maker-Kit</strong> (100% guaranteed), and <strong>Crystal Module</strong> (3% chance / 34 pity, or 3.5% / 29 pity when paired with <strong>Crystal Chip</strong>). Also used to expand Inventory slots (cost = <code>2^(current_slots - 10)</code>).</p>
+                            <p>• <strong>NULL (⬛):</strong> Anomaly currency obtained at a <code>1.404%</code> chance every 19 rolls when the result is a <strong>negative number</strong>. Used for negative-luck Potions and Malfunction Module crafting.</p>
+                            <p>• <strong>Compressed Crystal (💠 CC):</strong> Currency purchased in the <strong>Black Market</strong> for <code>1,000 Crystals</code> (stock of 5, 10, 20, or 50) or in the <strong>Quest Token Shop</strong> for <code>15 Quest Tokens</code> (limit 1/week, requires &gt;25,000 rolls).</p>
+                        </div>
+                        <div class="guide-block">
+                            <h4>🎲 2. Luck Formula, Roll Mechanics &amp; Potion Ranks</h4>
+                            <p><code>Luck = (((1 + Basic Luck) * Multi Luck) + Special Luck) * FINAL MULTIPLIER</code></p>
+                            <p>• <strong>Base Cooldown:</strong> <code>10.00s</code> (minimum <code>1.00s</code>).</p>
+                            <p>• <strong>Potion Rank Rules:</strong> Potions with a numeric Rank (e.g., Rank <code>1.0</code>, Rank <code>-2.0</code>) allow only <strong>1 active potion per rank</strong> at a time and cannot overwrite a different potion of the same rank. Consuming the <strong>exact same potion</strong> extends its remaining roll duration. <strong>Special Rank</strong> potions can be used at any time and stack freely with all ranks!</p>
+                        </div>
+                        <div class="guide-block">
+                            <h4>⚙️ 3. Modules, Chips &amp; Inventory Storage</h4>
+                            <p>• You can equip <strong>1 Primary Module</strong> and <strong>1 Secondary Chip</strong> at a time. <em>Important: Unequipping a Module or Chip resets its accumulated roll counter/stacks back to 0!</em></p>
+                            <p>• <strong>Auto-Roll:</strong> Equip <strong>Auto-Roll Machine</strong> (pauses every 1,337 rolls until you roll manually once).</p>
+                            <p>• <strong>Inventory &amp; Auto-Sell:</strong> You start with <strong>10 slots</strong>. If your inventory is full when a new number is rolled, the smallest unlocked number is automatically sold. Lock your best numbers so they are never replaced, and configure positive/negative Auto-Sell thresholds in <strong>Settings</strong>.</p>
+                        </div>
+                        <div class="guide-block">
+                            <h4>👑 4. Rolling Titles</h4>
+                            <p>• Equip <strong>Spectrometer Module</strong> to roll Titles alongside numbers, from <code>[Sol]</code> (<code>1 in 1</code>) up to <code>[S p e c t r u m]</code> (<code>1 in 10,000</code>)!</p>
+                        </div>
+                        <div class="guide-block">
+                            <h4>🌍 5. Daily Progression, Shrine Pray &amp; Black Market</h4>
+                            <p>• <strong>Daily Rewards (&gt;daily):</strong> Resets at <strong>00:00 UTC</strong>. Scales across 5 tiers based on your Total Rolls (Tier 1: &lt;1k rolls up to Tier 5: 1,000,000+ rolls with overflow Crystal chances).</p>
+                            <p>• <strong>Shrine Pray (&gt;pray):</strong> Pray once every <strong>6 hours</strong> to permanently gain <strong class="kw-basic">+0.01 Basic Luck</strong>.</p>
+                            <p>• <strong>Daily Quests (&gt;quest):</strong> Complete 3 daily quests to earn Coins, Potions, and <strong>Quest Tokens (🎫)</strong> (plus 1 free Reroll per day).</p>
+                            <p>• <strong>Black Market (&gt;bshop):</strong> Spawns randomly every 60s (<code>0.1%</code> chance) and stays open for <strong>10 minutes</strong>. Offers a <strong>25% discount</strong> on standard shop items (100 limit on unlimited items) and exclusive items (<em>Compressed Crystal</em>, <em>Crystal Maker-Kit</em>, <em>Reality Potion</em>, <em>Oblivion Potion</em>). Spawns are delivered via private Discord DMs to opted-in players!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window hidden" id="win-leaderboard" data-title="Leaderboard" data-icon="🏆" style="top: 70px; left: 280px; width: 600px; height: 470px;">
+            <div class="title-bar">
+                <div class="title-bar-left">
+                    <span class="win-icon">🏆</span>
+                    <span class="win-title">Global Leaderboards (&gt;lb)</span>
+                </div>
+                <div class="title-bar-controls">
+                    <button class="win-ctrl btn-min" title="Minimize">&#x2012;</button>
+                    <button class="win-ctrl btn-max" title="Maximize">&#x25A1;</button>
+                    <button class="win-ctrl btn-close" title="Close">&#x2715;</button>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="inv-toolbar">
+                    <div class="lb-filters">
+                        <select id="lb-type-select" class="win-input">
+                            <option value="rolls">🎲 Total Rolls</option>
+                            <option value="score">🏅 Total Score</option>
+                            <option value="pos">📈 Highest Roll (+)</option>
+                            <option value="neg">📉 Lowest Roll (-)</option>
+                        </select>
+                        <select id="lb-period-select" class="win-input">
+                            <option value="all">🌐 All-Time</option>
+                            <option value="monthly">📅 Monthly</option>
+                            <option value="weekly">📆 Weekly</option>
+                        </select>
+                        <span class="hub-status-pill mono" id="lb-refresh-countdown" style="padding: 4px 10px; font-size: 11px;">⏳ Next refresh in 5m 00s</span>
+                    </div>
+                    <div class="lb-pager">
+                        <button class="win-btn small" id="btn-lb-prev" disabled>◀ Prev</button>
+                        <span id="lb-page-label" class="mono">Page 1</span>
+                        <button class="win-btn small" id="btn-lb-next" disabled>Next ▶</button>
+                    </div>
+                </div>
+                <div class="inv-table-wrap">
+                    <table class="win-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Player</th>
+                                <th>Title / Achievement</th>
+                                <th>Record Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lb-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="window hidden" id="win-terminal" data-title="Command Prompt" data-icon="💻" style="top: 85px; left: 220px; width: 580px; height: 380px;">
+            <div class="title-bar">
+                <div class="title-bar-left">
+                    <span class="win-icon">💻</span>
+                    <span class="win-title">Administrator: A.R.I.S Command Prompt</span>
+                </div>
+                <div class="title-bar-controls">
+                    <button class="win-ctrl btn-min" title="Minimize">&#x2012;</button>
+                    <button class="win-ctrl btn-max" title="Maximize">&#x25A1;</button>
+                    <button class="win-ctrl btn-close" title="Close">&#x2715;</button>
+                </div>
+            </div>
+            <div class="window-body terminal-body">
+                <div class="terminal-output" id="terminal-output">
+                    <div>A.R.I.S Simulation Engine [Version 2.0.26]</div>
+                    <div>(c) A.R.I.S Corporation. All rights reserved.</div>
+                    <div>Type "&gt;help" for commands. Typing "&gt;r", "&gt;inv", "&gt;shop", "&gt;stat", etc. will also open that window!</div>
+                    <br/>
+                </div>
+                <div class="terminal-input-row">
+                    <span class="terminal-prompt">C:\ARIS&gt;</span>
+                    <input type="text" id="terminal-input" class="terminal-input" placeholder="Type a command (>r, >shop, >inv, >daily, >pray, >quest, >stat, >lb, cls)..." autocomplete="off" />
+                </div>
+            </div>
+        </div>
+
+        <div class="window hidden" id="win-settings" data-title="Settings" data-icon="⚙️" style="top: 70px; left: 240px; width: 680px; height: 500px;">
+            <div class="title-bar">
+                <div class="title-bar-left">
+                    <span class="win-icon">⚙️</span>
+                    <span class="win-title">Settings — System, Theme &amp; Player Configuration</span>
+                </div>
+                <div class="title-bar-controls">
+                    <button class="win-ctrl btn-min" title="Minimize">&#x2012;</button>
+                    <button class="win-ctrl btn-max" title="Maximize">&#x25A1;</button>
+                    <button class="win-ctrl btn-close" title="Close">&#x2715;</button>
+                </div>
+            </div>
+            <div class="window-body settings-body" style="padding: 0; display: flex; flex-direction: row; overflow: hidden;">
+                <div class="settings-sidebar" id="settings-sidebar">
+                    <div class="settings-nav-item active" data-set-pane="personal">
+                        <span class="set-nav-icon">🎨</span>
+                        <span class="set-nav-label">Personalization</span>
+                    </div>
+                    <div class="settings-nav-item" data-set-pane="autosell">
+                        <span class="set-nav-icon">💰</span>
+                        <span class="set-nav-label">Auto-Sell Rules</span>
+                    </div>
+                    <div class="settings-nav-item" data-set-pane="privacy">
+                        <span class="set-nav-icon">🎲</span>
+                        <span class="set-nav-label">Gameplay &amp; Privacy</span>
+                    </div>
+                    <div class="settings-nav-item" data-set-pane="account">
+                        <span class="set-nav-icon">🌟</span>
+                        <span class="set-nav-label">Custom Color &amp; Account</span>
+                    </div>
+                </div>
+
+                <div class="settings-content-wrap" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0;">
+                    <div class="settings-content-scroll" style="flex: 1; overflow-y: auto; padding: 16px;">
+                        <div class="settings-content-pane" id="set-pane-personal">
+                            <div class="set-pane-header">Personalization</div>
+                            <div class="win11-setting-card">
+                                <div class="setting-card-info">
+                                    <div class="setting-card-title">Application Color Theme</div>
+                                    <div class="setting-card-desc">Switch between Dark Theme (authentic Aero/Mica) and crisp Light Theme.</div>
+                                </div>
+                                <div class="setting-card-control">
+                                    <select id="set-theme" class="win-input" style="width: 170px;">
+                                        <option value="dark">🌙 Dark Theme (Default)</option>
+                                        <option value="light">☀️ Light Theme</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="win11-setting-card">
+                                <div class="setting-card-info">
+                                    <div class="setting-card-title">Desktop Wallpaper</div>
+                                    <div class="setting-card-desc">Upload a local image (PNG, JPG, WebP, GIF) as your custom desktop wallpaper.</div>
+                                </div>
+                                <div class="setting-card-control wallpaper-ctrl-row">
+                                    <div id="wallpaper-preview-box" class="wallpaper-preview-box" title="Wallpaper Preview"></div>
+                                    <select id="set-wallpaper-fit" class="win-input" style="width: 96px;" title="Wallpaper Fit">
+                                        <option value="cover">Cover</option>
+                                        <option value="contain">Fit</option>
+                                        <option value="100% 100%">Stretch</option>
+                                    </select>
+                                    <input type="file" id="set-wallpaper-file" accept="image/*" class="hidden" />
+                                    <button type="button" id="btn-wallpaper-upload" class="win-btn primary small">📁 Upload</button>
+                                    <button type="button" id="btn-wallpaper-reset" class="win-btn small hidden">↺ Reset</button>
+                                </div>
+                            </div>
+                            <div class="win11-setting-card">
+                                <div class="setting-card-info">
+                                    <div class="setting-card-title">Hide Desktop Watermark</div>
+                                    <div class="setting-card-desc">Hide the version and architecture watermark in the bottom-right corner.</div>
+                                </div>
+                                <div class="setting-card-control">
+                                    <label class="win-toggle-switch">
+                                        <input type="checkbox" id="set-hide-watermark" />
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="win11-setting-card">
+                                <div class="setting-card-info">
+                                    <div class="setting-card-title">System &amp; App Sound Effects</div>
+                                    <div class="setting-card-desc">Play subtle tactile audio feedback for windows and notifications.</div>
+                                </div>
+                                <div class="setting-card-control">
+                                    <label class="win-toggle-switch">
+                                        <input type="checkbox" id="set-sfx-enabled" checked />
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="win11-setting-card">
+                                <div class="setting-card-info">
+                                    <div class="setting-card-title">UI Sound Volume</div>
+                                    <div class="setting-card-desc">Adjust master volume for Web OS interface sound effects.</div>
+                                </div>
+                                <div class="setting-card-control sfx-vol-row">
+                                    <input type="range" id="set-sfx-volume" min="0" max="100" value="45" />
+                                    <span id="set-sfx-volume-label" class="sfx-vol-label">45%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-content-pane hidden" id="set-pane-autosell">
+                            <div class="set-pane-header">Auto-Sell Rules (&gt;setting)</div>
+                            <div class="win11-setting-card">
+                                <div class="setting-card-info">
+                                    <div class="setting-card-title">Positive Auto-Sell Threshold</div>
+                                    <div class="setting-card-desc">Positive rolls with rarity &le; this value are automatically sold for Coins.</div>
+                                </div>
+                                <div class="setting-card-control">
+                                    <input type="text" id="set-autosell-pos" class="win-input" value="0" style="width: 150px;" />
+                                </div>
+                            </div>
+                            <div class="win11-setting-card">
+                                <div class="setting-card-info">
+                                    <div class="setting-card-title">Negative Auto-Sell Threshold</div>
+                                    <div class="setting-card-desc">Negative rolls with |rarity| &le; this value are automatically sold for Coins.</div>
+                                </div>
+                                <div class="setting-card-control">
+                                    <input type="text" id="set-autosell-neg" class="win-input" value="0" style="width: 150px;" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-content-pane hidden" id="set-pane-privacy">
+                            <div class="set-pane-header">Gameplay &amp; Privacy Toggles</div>
+                            <div class="win11-setting-card">
+                                <div class="setting-card-info">
+                                    <div class="setting-card-title">Enable Luck Buffs</div>
+                                    <div class="setting-card-desc">Apply active Potion, Module, and Chip luck buffs (toggle off to roll with 1x Base Luck).</div>
+                                </div>
+                                <div class="setting-card-control">
+                                    <label class="win-toggle-switch">
+                                        <input type="checkbox" id="set-luck-toggle" checked />
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="win11-setting-card">
+                                <div class="setting-card-info">
+                                    <div class="setting-card-title">Private Profile &amp; Leaderboard Anonymity</div>
+                                    <div class="setting-card-desc">Mask your username as Player_XXXX on public leaderboards and profile lookups.</div>
+                                </div>
+                                <div class="setting-card-control">
+                                    <label class="win-toggle-switch">
+                                        <input type="checkbox" id="set-privacy" />
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="win11-setting-card">
+                                <div class="setting-card-info">
+                                    <div class="setting-card-title">Black Market Spawn Notifications</div>
+                                    <div class="setting-card-desc">Receive real-time alerts when the secret Black Market merchant appears.</div>
+                                </div>
+                                <div class="setting-card-control">
+                                    <label class="win-toggle-switch">
+                                        <input type="checkbox" id="set-bshop-ping" checked />
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="win11-setting-card">
+                                <div class="setting-card-info">
+                                    <div class="setting-card-title">Hide Equipped Hardware on Profile</div>
+                                    <div class="setting-card-desc">Conceal your currently equipped Module and Chip when other players inspect you.</div>
+                                </div>
+                                <div class="setting-card-control">
+                                    <label class="win-toggle-switch">
+                                        <input type="checkbox" id="set-hide-equip" />
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-content-pane hidden" id="set-pane-account">
+                            <div class="set-pane-header">Custom Color &amp; Account Settings</div>
+                            <div class="win11-setting-card">
+                                <div class="setting-card-info">
+                                    <div class="setting-card-title">Custom Embed Color <span id="set-color-status" style="font-size: 11px; color: var(--win-text-dim); margin-left: 6px;">🔒 Locked</span></div>
+                                    <div class="setting-card-desc">Personalized Hex code (e.g. #0078D7) for Discord bot embeds and profile highlights.</div>
+                                </div>
+                                <div class="setting-card-control">
+                                    <input type="text" id="set-custom-color" class="win-input" placeholder="#0078D7" disabled style="width: 150px;" />
+                                </div>
+                            </div>
+                            <div class="win11-setting-card">
+                                <div class="setting-card-info">
+                                    <div class="setting-card-title">Browser Session Authentication</div>
+                                    <div class="setting-card-desc">Sign out of this active A.R.I.S Web OS browser session.</div>
+                                </div>
+                                <div class="setting-card-control">
+                                    <button class="win-btn danger" id="btn-settings-logout">🚪 Sign Out</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-sticky-footer">
+                        <button class="win-btn primary" id="btn-save-settings">💾 Save All Settings</button>
+                        <div id="settings-feedback" class="inline-feedback"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window hidden" id="win-confirm-modal" data-title="Confirm Action" data-icon="⚠️" style="top: 180px; left: 380px; width: 400px; height: 210px; min-height: 190px; z-index: 15000;">
+            <div class="title-bar">
+                <div class="title-bar-left">
+                    <span class="win-icon">⚠️</span>
+                    <span class="win-title" id="confirm-modal-title">Confirm Action</span>
+                </div>
+                <div class="title-bar-controls">
+                    <button class="win-ctrl btn-close" id="btn-confirm-close" title="Cancel">&#x2715;</button>
+                </div>
+            </div>
+            <div class="window-body" style="justify-content: space-between;">
+                <div id="confirm-modal-desc" style="font-size: 13px; line-height: 1.5;">
+                    Are you sure you want to proceed with this action?
+                </div>
+                <div style="font-size: 11px; color: var(--win-text-dim);">
+                    *Clicking outside to another window will cancel this action automatically.
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                    <button class="win-btn primary" id="btn-confirm-yes">✅ Confirm</button>
+                    <button class="win-btn danger" id="btn-confirm-no">❌ Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="desktop-watermark" id="desktop-watermark">
+            A.R.I.S Simulation Engine v2.0<br/>
+            Discord RNG Architecture
+        </div>
+
+        <div id="snap-ghost-overlay"></div>
+
+        <div id="desktop-marquee-box" class="desktop-marquee-box hidden"></div>
+
+        <div id="win-toast-container" class="win-toast-container"></div>
+
+        <div id="desktop-context-menu" class="context-menu hidden">
+            <div class="context-item" id="ctx-refresh">
+                <span>Refresh</span>
+            </div>
+            <div class="context-item" id="ctx-terminal">
+                <span>Open Terminal</span>
+            </div>
+            <div class="context-divider"></div>
+            <div class="context-submenu-wrap">
+                <div class="context-item" id="ctx-view">
+                    <span style="flex:1;">View</span>
+                    <span class="ctx-arrow">▶</span>
+                </div>
+                <div class="context-submenu" id="ctx-view-submenu">
+                    <div class="context-item" data-icon-size="large">
+                        <span class="ctx-check" id="check-icon-large"></span>
+                        <span>Large icons</span>
+                    </div>
+                    <div class="context-item" data-icon-size="medium">
+                        <span class="ctx-check" id="check-icon-medium">✓</span>
+                        <span>Medium icons</span>
+                    </div>
+                    <div class="context-item" data-icon-size="small">
+                        <span class="ctx-check" id="check-icon-small"></span>
+                        <span>Small icons</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="taskbar-context-menu" class="context-menu hidden">
+            <div class="context-item" id="ctx-taskbar-taskmgr">
+                <span>Task Manager</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="start-menu" class="hidden">
+        <div class="start-sidebar" id="start-sidebar">
+            <div class="start-side-top">
+                <button class="start-side-btn" id="start-btn-menu" title="MENU">
+                    <span class="side-icon">☰</span>
+                    <span class="side-label">MENU</span>
+                </button>
+            </div>
+            <div class="start-side-bottom">
+                <button class="start-side-btn" id="start-btn-profile" title="Account">
+                    <span class="side-icon">👤</span>
+                    <span class="side-label">Account</span>
+                </button>
+                <button class="start-side-btn" id="start-btn-settings" title="Setting">
+                    <span class="side-icon">⚙️</span>
+                    <span class="side-label">Setting</span>
+                </button>
+                <button class="start-side-btn" id="start-btn-logout" title="Logout">
+                    <span class="side-icon">🚪</span>
+                    <span class="side-label">Logout</span>
+                </button>
+            </div>
+        </div>
+        <div class="start-app-list" id="start-app-list">
+            <div class="start-category">A.R.I.S Core Systems</div>
+            <div class="start-item" data-open="win-roll"><span>🎲</span> A.R.I.S Roll</div>
+            <div class="start-item" data-open="win-shop"><span>🛒</span> A.R.I.S Store</div>
+            <div class="start-item" data-open="win-inventory"><span>🎒</span> Inventory Explorer</div>
+            <div class="start-item" data-open="win-taskmgr"><span>📊</span> Task Manager (Status)</div>
+            <div class="start-item" data-open="win-profile"><span>👤</span> Profile, Achieve &amp; Titles</div>
+            <div class="start-item" data-open="win-hub"><span>🎯</span> Mission Hub (Daily/Quest)</div>
+            <div class="start-item" data-open="win-leaderboard"><span>🏆</span> Global Leaderboard</div>
+            <div class="start-item" data-open="win-terminal"><span>💻</span> Command Prompt</div>
+            <div class="start-item" data-open="win-settings"><span>⚙️</span> Settings</div>
+            <div class="start-item" id="start-item-guide" data-open="win-hub" data-tab="guild"><span>📘</span> Game Guide (&gt;guild)</div>
+        </div>
+        <div class="start-tiles">
+            <div class="start-category">Live Telemetry</div>
+            <div class="tile-grid">
+                <div class="live-tile wide accent-blue" data-open="win-roll">
+                    <div class="tile-content">
+                        <span class="tile-big">🎲</span>
+                        <div>
+                            <div class="tile-head">Roll Engine</div>
+                            <div class="tile-sub" id="tile-rolls-sub">0 Total Rolls</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="live-tile accent-purple" data-open="win-taskmgr">
+                    <div class="tile-head">TOTAL LUCK</div>
+                    <div class="tile-metric" id="tile-luck-val">x1.00</div>
+                </div>
+                <div class="live-tile wide accent-dark" data-open="win-hub">
+                    <div class="tile-content">
+                        <span class="tile-big">🎯</span>
+                        <div>
+                            <div class="tile-head">Mission Hub</div>
+                            <div class="tile-sub">Daily, Pray, Quests &amp; Codes</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="search-flyout" class="search-flyout hidden"></div>
+
+    <div id="taskbar-preview-card" class="taskbar-preview-card hidden"></div>
+
+    <footer id="taskbar">
+        <div class="taskbar-left">
+            <button id="start-btn" class="start-text-btn" title="Start">
+                START
+            </button>
+            <div class="taskbar-search">
+                <span class="search-icon">🔎</span>
+                <input type="text" id="cortana-input" placeholder="Run command (>r, >shop, >inv, >daily, >stat)..." autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="taskbar-apps" id="taskbar-apps"></div>
+
+        <div class="taskbar-tray">
+            <button id="tray-sfx-btn" class="tray-sfx-btn" type="button" title="UI Sounds: On (Click to Mute)">🔊</button>
+            <div class="tray-status" title="MySQL Database Connected">🟢 DB Online</div>
+            <div class="tray-clock" id="tray-clock">
+                <div id="clock-time">12:00 PM</div>
+                <div id="clock-date">11/7/2026</div>
+            </div>
+            <div class="show-desktop-sliver" id="btn-show-desktop" title="Show Desktop"></div>
+        </div>
+    </footer>
+
+    <script src="/app.js?v=2.9"></script>
+    <script src="/apps/sfx.js?v=1.4"></script>
+</body>
+</html>

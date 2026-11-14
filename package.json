@@ -1,0 +1,23 @@
+{
+  "name": "rng-discord-bot",
+  "version": "1.0.0",
+  "description": "A.R.I.S Discord RNG Bot",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node --dns-result-order=ipv4first src/index.js",
+    "local": "node --dns-result-order=ipv4first src/index.js",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "discord.js": "^14.27.0",
+    "dotenv": "^18.0.9",
+    "mysql2": "^3.24.6"
+  },
+  "devDependencies": {
+    "jest": "^30.5.2"
+  }
+}
