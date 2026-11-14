@@ -52,7 +52,7 @@ Key variables in `.env`:
 npm start
 ```
 
-- **Windows**: You can also run `start-local.bat`.
+- **Windows**: You can also run `start.bat`.
 - **Docker**:
   ```bash
   docker build -t aris-rng .
@@ -95,10 +95,12 @@ npm start
 │   ├── utils/       # Math, catalog, and Discord frame helpers
 │   └── web/         # Web OS HTTP router & service layer
 ├── Dockerfile
+├── LICENSE
 ├── .env.example
-└── package.json
+├── package.json
+└── start.bat
 ```
 
 ## License
 
-ISC
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)** — see the [LICENSE](LICENSE) file for details. Any modified version hosted or run over a network must also release its corresponding source code under AGPL-3.0.
