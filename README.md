@@ -52,7 +52,7 @@ Key variables in `.env`:
 npm start
 ```
 
-- **Windows**: You can also run `start.bat`.
+- **Windows**: You can also run `start_local.bat`.
 - **Docker**:
   ```bash
   docker build -t aris-rng .
@@ -98,7 +98,7 @@ npm start
 ├── LICENSE
 ├── .env.example
 ├── package.json
-└── start.bat
+└── start_local.bat
 ```
 
 ## License
