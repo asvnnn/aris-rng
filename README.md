@@ -1,3 +1,5 @@
+<img width="1919" height="1072" alt="Screenshot 2026-11-15 111058" src="https://github.com/user-attachments/assets/fcafbae2-49fe-4b53-acd7-263c7e3783e1" />
+
 # A.R.I.S — Discord RNG Bot & Web OS
 
 A Discord RNG game bot built with `discord.js` v14 and MySQL, paired with a browser-based **Web OS** (`>web`) that syncs directly with your Discord player profile.
